@@ -61,7 +61,7 @@ pip install requests tkinter matplotlib
 2. Run the Application
    Start the Flask application:
 ```bash
-python app.py
+python weather_app.py
 ```
 
 3. Get weather location
