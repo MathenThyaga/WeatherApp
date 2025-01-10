@@ -126,6 +126,6 @@ hourly_forecast = [
 ```
 
 # References
-Spoonacular: 
-https://www.weatherapi.com/docs/
+WeatherAPI: 
+- https://www.weatherapi.com/docs/
 
