@@ -39,19 +39,19 @@ Suggests actions or precautions based on current weather conditions. Examples:
 
 # Dependencies
 # Python Libraries:
-os
-requests
-tkinter
-matplotlib
-re
-External SDKs: inference_sdk, jamaibase
+- `os`
+- `requests`
+- `tkinter`
+- `matplotlib`
+- `re`
+- External SDKs: `inference_sdk`
 
 # APIs and Services:
 WeatherAPI: For fetching current weather conditions, hourly forecasts, and 3-day forecasts.
 
 # File Structure
-weather_app_backend.py: Backend logic for fetching and processing weather data.
-weather_app.py: GUI frontend for interacting with users. This is the main application file
+- `weather_app_backend.py`: Backend logic for fetching and processing weather data.
+- `weather_app.py`: GUI frontend for interacting with users. This is the main application file
 
 # Usage
 1. Install Dependencies Use the following command to install required Python libraries:
@@ -77,7 +77,7 @@ python app.py
   
 # API Configuration
 WeatherAPI
-Replace the `API_KEY` in your backend (weather_app_backend.py) with your actual WeatherAPI key.
+- Replace the `API_KEY` in your backend (weather_app_backend.py) with your actual WeatherAPI key.
 
 # Code Highlights
 ## Weather Data Fetching (WeatherAPI)
