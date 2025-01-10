@@ -1,4 +1,4 @@
-# WeatherApp
+# Weather Forecast App
 
 # Overview
 This project aims to provide users with current weather conditions such as temperature, humidity, wind speed, and overall weather description. It also provides a simple interface for users to check weather conditions by entering their location.
