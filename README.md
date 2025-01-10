@@ -47,13 +47,14 @@ static/: Directory for static files (CSS, JS, images).
 
 # Usage
 1. Install Dependencies Use the following command to install required Python libraries:
-
+```bash
 pip install flask requests
-
+```
 2. Run the Application
    Start the Flask application:
-
+```bash
 python app.py
+```
 By default, the app runs on http://127.0.0.1:5000.
 
 Upload an Image
