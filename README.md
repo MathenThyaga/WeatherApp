@@ -1,110 +1,131 @@
 # WeatherApp
 
 # Overview
-This project is a Recipe Recommendation System that integrates machine learning inference and multiple APIs to detect ingredients from uploaded images and provide recipe suggestions. It also offers an analysis feature that evaluates recipe suitability based on user-specific data.
+This project aims to provide users with current weather conditions such as temperature, humidity, wind speed, and overall weather description. It also provides a simple interface for users to check weather conditions by entering their location.
 
 # Features
-1. Ingredient Detection
-Uses the Roboflow Inference API to detect ingredients in uploaded images.
+1. Current Weather Information
+Provides personalized weather recommendations based on the current weather conditions and temperature.
+Displays the current weather conditions for the specified location, including:
+- Temperature
+- Weather condition (e.g., Rain, Sunny, Cloudy) with Unicode icons.
+- Humidity and wind speed.
 
-2. Recipe Recommendation
-Fetches recipes based on detected ingredients using the Spoonacular API.
+2. 3-Day Weather Forecast
+Displays a detailed 3-day weather forecast including:
+- Date
+- Minimum and maximum temperatures
+- Weather condition with Unicode icons.
+  
+3. Hourly Weather Forecast
+Provides a detailed hourly forecast for the current day, displayed horizontally in a scrollable frame.
+Each hourly update includes:
+- Time (in HH:MM format)
+- Weather condition with Unicode icons.
+- Temperature.   
 
-3. Recipe Analysis
-Allows users to input personal details (e.g., weight, height, and health conditions) and analyzes recipe suitability using JamAI.
-
-4. Dynamic Redirection
-Redirects users to detailed recipe pages on Spoonacular.
-
+4. Dynamic Weather Recommendations
+Suggests actions or precautions based on current weather conditions. Examples:
+- "Carry an umbrella and wear waterproof shoes" for rainy weather.
+- "Stay hydrated and wear sunscreen" for hot, sunny days.
+- "Wear heavy winter clothing" for cold temperatures.
+  
 # Limitation
-The application faces limitations due to API rate limits, which restrict the number of requests that can be made within a specific timeframe. This can result in failed operations, particularly during periods of high user activity.
+1. The app fetches data provided by the WeatherAPI, which updates weather conditions periodically. This can lead to slight differences between the app's information and the real-time 
+   weather.
 
-The system's functionality is heavily dependent on the availability of external APIs, meaning any downtime or outages from the API providers will directly impact the application's performance.
-
-The Spoonacular API relies on pre-existing recipe data, which may not include the latest or trending recipes. This limitation reduces the application's ability to provide fresh or unique content to users.
+2. App relies on how WeatherAPI resolves locations like "Bangsar" to specific coordinates. If the location resolution is too broad or inaccurate, the data might represent a nearby weather 
+   station instead of the exact area.
 
 # Dependencies
-Python Libraries:
+# Python Libraries:
 os
 requests
-flask
-tempfile
+tkinter
+matplotlib
 re
 External SDKs: inference_sdk, jamaibase
 
 # APIs and Services:
-Roboflow Inference API: For object detection in images.
-Spoonacular API: For recipe retrieval.
-JamAI: For advanced analysis and result storage.
+WeatherAPI: For fetching current weather conditions, hourly forecasts, and 3-day forecasts.
 
 # File Structure
-app.py: Main application file containing the Flask app and routes.
-templates/: Directory for HTML templates.
-index.html: Home page for image uploads.
-recipes.html: Displays detected ingredients and recommended recipes.
-analysis_result.html: Shows analyzed recipe suitability.
-static/: Directory for static files (CSS, JS, images).
+weather_app_backend.py: Backend logic for fetching and processing weather data.
+weather_app.py: GUI frontend for interacting with users. This is the main application file
 
 # Usage
 1. Install Dependencies Use the following command to install required Python libraries:
 ```bash
-pip install flask requests
+pip install requests tkinter matplotlib
 ```
 2. Run the Application
    Start the Flask application:
 ```bash
 python app.py
 ```
-By default, the app runs on http://127.0.0.1:5000.
 
-Upload an Image
+3. Get weather location
 
-Navigate to the home page.
-Upload an image of food items.
-View detected ingredients and recipes.
-Analyze Recipe
+- Enter a location in the search bar.
+- View current weather, hourly forecast, and 3-day forecast.
 
-Input your weight, height, and health conditions.
-Get a detailed analysis of the recipe's suitability.
+4. Recommendations
+- View weather-specific recommendations (e.g., carry an umbrella if rain is forecasted).
 
+5. Hourly Forecast
+- Scroll through the hourly weather forecast to plan your day.
+  
 # API Configuration
-Roboflow API
-
-Replace api_url and api_key in InferenceHTTPClient initialization with your Roboflow credentials.
-Spoonacular API
-
-Replace SPOONACULAR_API_KEY with your Spoonacular API key.
-JamAI API
-
-Replace the api_key and project_id in JamAI initialization with your JamAI credentials.
+WeatherAPI
+Replace the `API_KEY` in your backend (weather_app_backend.py) with your actual WeatherAPI key.
 
 # Code Highlights
-Ingredient Detection (Roboflow)
-result = CLIENT.infer(temp_file.name, model_id=MODEL_ID)
-for prediction in result["predictions"]:
-    label = prediction["class"]
-    detected_items.append(label)
-    
-Recipe Fetching (Spoonacular)
+## Weather Data Fetching (WeatherAPI)
+```python
 params = {
-    "apiKey": SPOONACULAR_API_KEY,
-    "query": ",".join(detected_items),
-    "number": 20,
-    "ranking": 2
+    "key": API_KEY,
+    "q": location,  # User-entered location
+    "days": 3,      # Number of forecast days
+    "aqi": "no",    # Exclude air quality index
+    "alerts": "no"  # Exclude alerts
 }
-response = requests.get(SPOONACULAR_API_URL, params=params)
+response = requests.get(f"{BASE_URL}/forecast.json", params=params)
+if response.status_code == 200:
+    weather_data = response.json()
+else:
+    raise Exception(f"API call failed: {response.status_code}, {response.text}")
+```
+    
+## Weather Recommendations
+```python
+def get_weather_recommendation(condition, temp):
+    if "rain" in condition.lower():
+        return "Carry an umbrella and wear waterproof shoes."
+    elif "snow" in condition.lower():
+        return "Wear warm clothes and be cautious of slippery roads."
+    elif "sunny" in condition.lower() and temp > 30:
+        return "Stay hydrated and wear sunscreen."
+    elif "wind" in condition.lower():
+        return "Secure loose items and avoid high places."
+    elif temp < 5:
+        return "Wear heavy winter clothing to stay warm."
+    else:
+        return "Weather is moderate. Enjoy your day!"
+```
 
-Analysis (JamAI)
-completion = jamai.add_table_rows(
-    "action",
-    p.RowAddRequest(
-        table_id="Recipe",
-        data=[{"weight": weight, "height": height, "diseases": diseases, "summary": recipe_summary}]
-    )
-)
+## Hourly Weather Forecast Parsing
+```python
+hourly_forecast = [
+    {
+        "time": hour["time"][-5:],  # Format time as HH:MM
+        "temp": hour["temp_c"],
+        "condition": hour["condition"]["text"]
+    }
+    for hour in data["forecast"]["forecastday"][0]["hour"]
+]
+```
 
 # References
-Spoonacular: https://spoonacular.com/food-api/docs
-
-JamaiBase: https://docs.jamaibase.com/
+Spoonacular: 
+https://www.weatherapi.com/docs/
 
